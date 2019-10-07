@@ -1,0 +1,35 @@
+isi Berkas = {
+  baca: fungsi(path) {
+    isi n = 0; 
+    isi res = ''; 
+    isi buf = 'xxxxxxxxxx'; // Should be > 5
+    isi fp = Berkas.fopen(path, 'r');
+    jika (fp === kosong) balik kosong;
+    ulang ((n = Berkas.fread(buf, 1, buf.panjang, fp)) > 0) {
+      res += buf.slice(0, n);
+    }
+    Berkas.fclose(fp);
+    balik res;
+  },
+  hapus: ffi('int remove(char *)'),
+  ganti_nama: ffi('int rename(char *, char *)'),
+  tulis: fungsi(str, path, oMode) {
+    isi fp = Berkas.fopen(path, oMode || 'w');
+    jika (fp === kosong) balik 0;
+    isi off = 0; isi tot = str.panjang;
+    ulang (off < tot) {
+      isi len = 5;  // Use light 5-byte strings for writing
+      jika (off + len > tot) len = tot - off;
+      isi n = Berkas.fwrite(str.slice(off, off + len), 1, len, fp);
+      // jika (n <= 0) break;
+      off += n;
+    }
+    Berkas.fclose(fp);
+    balik off;
+  },
+
+  fopen: ffi('void *fopen(char *, char *)'),
+  fclose: ffi('void fclose(void *)'),
+  fread: ffi('int fread(char *, int, int, void *)'),
+  fwrite: ffi('int fwrite(char *, int, int, void *)'),
+};
